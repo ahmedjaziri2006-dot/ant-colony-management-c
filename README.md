@@ -1,51 +1,136 @@
-# Ant Colony Management in C
+# Simulation de Gestion d'une Colonie de Fourmis
 
-## Description
-This project is a C program that simulates the management of an ant colony. It models key aspects of colony life such as reproduction, food collection, resource usage, task allocation, and seasonal effects.
+Programme de simulation en C qui modélise le fonctionnement d'une colonie de fourmis sur un cycle annuel complet (365 jours). Le projet simule le cycle de vie des fourmis, la reproduction de la reine, la collecte et la consommation de nourriture, la division du travail, ainsi que l'impact des saisons et d'événements climatiques sur la colonie.
 
-The project was developed as part of an advanced algorithms assignment and focuses on modular programming, data modeling, and the use of classical data structures in C.
+## Contexte
 
-## Objectives
-The main objective is to simulate the internal functioning of an ant colony while managing its resources and organization. The program aims to represent:
-- the life cycle of female ants
-- the queen’s reproduction cycle
-- food collection and consumption
-- division of work among ants
-- seasonal effects on the colony
-- overall colony resource management
+Projet académique réalisé à l'ESIEA (novembre 2024 – janvier 2025) en équipe de 3 personnes, dans le cadre d'un module d'algorithmique et structures de données avancées.
 
-## Features
-### Mandatory features
-- Simulation of female ant life cycle
-- Queen reproduction management
-- Colony food management
-- Food collection by worker ants
-- Food resource usage
-- Task division based on age and role
-- Seasonal effects depending on the chosen climate
+## Modèle simulé
 
-### Possible extensions
-Depending on the implemented version, the project may also include:
-- male ant life cycle simulation
-- different colony types
-- communication systems between ants
-- hygiene and disease management
-- dynamic external environment
-- random external events affecting the colony
+### Cycle de vie
 
-## Data structures
-This project relies on core C data structures and modular design principles. According to the assignment, the implementation may involve:
-- arrays
-- structures
-- linked lists
-- queues
-- stacks
-- trees
+La colonie est composée de plusieurs catégories de fourmis qui évoluent automatiquement :
 
-## Project structure
-```text
-.
-├── main.c
-├── fonctions.c
-├── programme.h
-└── Makefile
+- **Œufs** : éclosent après 3 jours pour devenir des jeunes
+- **Jeunes** : jusqu'à 40 jours, puis deviennent ouvrières
+- **Ouvrières** : jusqu'à 60 jours, puis deviennent aînées
+- **Aînées** : jusqu'à 70 jours, puis meurent
+
+### Reine et mâle
+
+- La **reine** pond 6 œufs par jour jusqu'à 100 jours, puis est remplacée par une nouvelle reine
+- Un **mâle** vit jusqu'à 20 jours et est remplacé à sa mort
+
+### Saisons et collecte de ressources
+
+Le cycle annuel est divisé en quatre saisons :
+
+| Saison | Jours | Taux de collecte |
+|---|---|---|
+| Printemps | 1 – 93 | élevé (350 – 600 unités/jour) |
+| Été | 94 – 183 | élevé (300 – 550 unités/jour) |
+| Automne | 184 – 276 | moyen (200 – 350 unités/jour) |
+| Hiver | 277 – 365 | faible (50 – 200 unités/jour) |
+
+À l'intérieur de chaque saison, la collecte varie selon une rotation de 3 jours.
+
+### Événements climatiques
+
+Trois événements impactent la colonie au cours de l'année :
+- **Jour 130** : sécheresse → 8 aînées meurent
+- **Jour 240** : tempête de vent → 15 aînées meurent
+- **Jour 320** : tempête de neige → 22 aînées meurent
+
+### Consommation
+
+La colonie consomme 300 unités de nourriture par jour. Si le stock est insuffisant, un avertissement s'affiche.
+
+## Fonctionnalités
+
+- Simulation jour par jour sur un cycle de 365 jours
+- Suivi du cycle de vie des fourmis avec transition automatique entre catégories
+- Gestion dynamique des œufs via une liste chaînée
+- Division du travail : alternance quotidienne entre ouvrières actives et inactives
+- Affichage détaillé de l'état de la colonie chaque jour (population, stock, événements)
+
+## Algorithmes et concepts
+
+- **Liste chaînée dynamique** pour la gestion des œufs (allocation/libération mémoire avec `malloc` / `free`)
+- **Tableaux statiques** pour le suivi des âges des fourmis dans chaque catégorie
+- **Compaction de tableaux** après suppression d'éléments (pattern de filtre in-place)
+- **Logique modulaire** basée sur le jour et la saison pour la collecte de ressources
+- **Machine à états** implicite pour les transitions de cycle de vie
+
+## Structures de données
+
+```c
+typedef struct {
+    int age_reine;
+    int nb_oeufs;
+    int vivante;
+} reine;
+
+typedef struct oeuf {
+    int temps_restant;
+    struct oeuf* suivant;
+} oeuf;
+
+typedef struct {
+    int jeunes;
+    int ouvrieres;
+    int ainees;
+    int actives;
+    int inactives;
+    int ages_jeunes[1000];
+    int ages_ouvrieres[1000];
+    int ages_ainees[1000];
+} division_travail;
+
+typedef struct {
+    int age;
+    int vivant;
+} male;
+```
+
+## Stack technique
+
+- **Langage :** C
+- **Build :** Makefile (gcc)
+
+## Structure du projet
+main.c         - boucle principale de simulation (365 jours)
+fonctions.c    - logique de la colonie (cycle de vie, ressources, division du travail)
+programme.h    - types, constantes (âges max, taux de collecte, etc.)
+Makefile       - configuration de build
+
+## Compilation et exécution
+
+```bash
+git clone https://github.com/ahmedjaziri2006-dot/ant-colony-management-c
+cd ant-colony-management-c
+make
+./programme
+```
+
+Pour nettoyer les fichiers compilés :
+
+```bash
+make clean
+```
+
+## Compétences mises en œuvre
+
+- Programmation en C avec gestion manuelle de la mémoire (linked lists, malloc/free sans fuite)
+- Modélisation algorithmique d'un système complexe à plusieurs entités interagissantes
+- Conception modulaire (séparation entre logique métier et boucle principale)
+- Manipulation simultanée de structures de données dynamiques et statiques selon les besoins
+- Simulation événementielle sur cycle long (365 itérations)
+
+## Auteurs
+
+Projet réalisé en équipe à l'ESIEA par Ahmed Jaziri et coéquipiers.
+
+## Licence
+
+Projet académique à but pédagogique.
